@@ -119,14 +119,22 @@ function Footer() {
   return (
     <footer className="footer">
       {isOpen ? (
-        <div className="order">
-          <p>We're currently open</p>
-          <button className="btn">Order</button>
-        </div>
+        <Order closeHour={closeHour} />
       ) : (
-        <p>We're closed. Come back tomorrow from {openHour}</p>
+        <p>We're closed. Come back tomorrow from {formatFullHour(openHour)}</p>
       )}
     </footer>
+  );
+}
+
+const formatFullHour = (hour) => `${hour}:00`;
+
+function Order(props) {
+  return (
+    <div className="order">
+      <p>We're currently open until {formatFullHour(props.closeHour)}</p>
+      <button className="btn">Order</button>
+    </div>
   );
 }
 
