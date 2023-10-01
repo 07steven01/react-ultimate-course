@@ -95,18 +95,16 @@ function Menu() {
 function Pizza(props) {
   console.log(props);
 
-  if (props.pizzaObj.soldOut) return null;
-
   const {
-    pizzaObj: { name, ingredients, photoName, price }, // nested object destructuring
+    pizzaObj: { name, ingredients, photoName, price, soldOut }, // nested object destructuring
   } = props;
   return (
-    <li className="pizza">
+    <li className={`pizza ${soldOut ? "sold-out" : ""}`}>
       <img src={photoName} alt={name} />
       <div>
         <h3>{name}</h3>
         <p>{ingredients}</p>
-        <span>{price}</span>
+        {!soldOut && <span>{price}</span>}
       </div>
     </li>
   );
