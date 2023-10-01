@@ -129,10 +129,10 @@ function Footer() {
 
 const formatFullHour = (hour) => `${hour}:00`;
 
-function Order(props) {
+function Order({ closeHour }) {
   return (
     <div className="order">
-      <p>We're currently open until {formatFullHour(props.closeHour)}</p>
+      <p>We're currently open until {formatFullHour(closeHour)}</p>
       <button className="btn">Order</button>
     </div>
   );
