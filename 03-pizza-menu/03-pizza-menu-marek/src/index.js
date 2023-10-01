@@ -68,20 +68,28 @@ function Header() {
 }
 
 function Menu() {
+  const pizzas = pizzaData;
   return (
     <main className="menu">
       <h2>Our menu</h2>
-      <ul className="pizzas">
-        {pizzaData.map((pizza) => (
-          <Pizza pizzaObj={pizza} key={pizza.name} />
-        ))}
-      </ul>
+      {pizzas.length > 0 ? (
+        <ul className="pizzas">
+          {pizzaData.map((pizza) => (
+            <Pizza pizzaObj={pizza} key={pizza.name} />
+          ))}
+        </ul>
+      ) : (
+        <p>We're still working on our menu. Please come back later!</p>
+      )}
     </main>
   );
 }
 
 function Pizza(props) {
   console.log(props);
+
+  if (props.pizzaObj.soldOut) return null;
+
   const {
     pizzaObj: { name, ingredients, photoName, price }, // nested object destructuring
   } = props;
@@ -110,7 +118,14 @@ function Footer() {
 
   return (
     <footer className="footer">
-      {new Date().toLocaleTimeString()} We're currently open
+      {isOpen ? (
+        <div className="order">
+          <p>We're currently open</p>
+          <button className="btn">Order</button>
+        </div>
+      ) : (
+        <p>We're closed. Come back tomorrow from {openHour}</p>
+      )}
     </footer>
   );
 }
