@@ -11,40 +11,86 @@ const starContainerStyle = {
   gap: "4px",
 };
 
-const textStyle = {
-  lineHeight: "0",
-  margin: "0",
-};
+export default function StarRating({
+  maxRating = 5,
+  color = "#fcc419",
+  size = 22,
+  className = "",
+  mapping = [],
+  defaultRating = 0,
+  onSetRating = {},
+}) {
+  const [rating, setRating] = useState(defaultRating);
+  const [tempRating, setTempRating] = useState(defaultRating);
 
-export default function StarRating({ maxRating = 5 }) {
-  const [rating, setRating] = useState(0);
+  const getMapping = function (index) {
+    return index == 0 ? "" : mapping[index - 1];
+  };
+
+  const textStyle = {
+    lineHeight: "0",
+    margin: "0",
+    color,
+    fontSize: `${size / 1.5}px`,
+  };
+
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className={className}>
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, i) => (
-          <Star key={i} handleClick={() => setRating(i + 1)} />
+          <Star
+            key={i}
+            filled={tempRating ? i + 1 <= tempRating : i + 1 <= rating}
+            handleClick={() => {
+              setRating(i + 1);
+              onSetRating(i + 1);
+            }}
+            handleMouseOver={() => setTempRating(i + 1)}
+            handleMouseLeave={() => setTempRating(0)}
+            color={color}
+            size={size}
+          />
         ))}
       </div>
-      <p style={textStyle}>{rating}</p>
+      <p style={textStyle}>
+        {getMapping(tempRating) ||
+          tempRating ||
+          getMapping(rating) ||
+          rating ||
+          ""}
+      </p>
     </div>
   );
 }
 
-const starStyle = {
-  width: "48px",
-  height: "48px",
-  display: "block",
-  cursor: "pointer",
-};
+function Star({
+  filled,
+  handleClick,
+  handleMouseOver,
+  handleMouseLeave,
+  color,
+  size,
+}) {
+  const starStyle = {
+    width: `${size}px`,
+    height: `${size}px`,
+    display: "block",
+    cursor: "pointer",
+  };
 
-function Star({ handleClick }) {
   return (
-    <span role="button" style={starStyle} onClick={handleClick}>
+    <span
+      role="button"
+      style={starStyle}
+      onClick={handleClick}
+      onMouseEnter={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        fill="none"
+        fill={filled ? color : "none"}
         viewBox="0 0 24 24"
-        stroke="#000"
+        stroke={color}
       >
         <path
           strokeLinecap="round"
