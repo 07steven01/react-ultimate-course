@@ -9,8 +9,9 @@ function Test() {
   const [movieRating, setMovieRating] = useState(0);
   return (
     <div>
-      <StarRating color="blue" onSetRating={setMovieRating} />
-      <p>This movie is rated {movieRating} stars</p>
+      <App />
+      {/* <StarRating color="blue" onSetRating={setMovieRating} />
+      <p>This movie is rated {movieRating} stars</p> */}
     </div>
   );
 }
