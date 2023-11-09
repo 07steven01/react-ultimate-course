@@ -54,38 +54,49 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
 export default function App() {
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
   const [isLoading, setIsLoading] = useState();
   const [error, setError] = useState();
-  const query = "ssdsds";
 
-  useEffect(function () {
-    async function fetchMovies() {
-      try {
-        setIsLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${apiKey}&s=${query}`
-        );
-        if (!res.ok) {
-          throw new Error("Fetching movies failed");
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        try {
+          setError(null);
+          setIsLoading(true);
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${apiKey}&s=${query}`
+          );
+          if (!res.ok) {
+            throw new Error("Fetching movies failed");
+          }
+          const data = await res.json();
+          setMovies(data.Search ?? []);
+        } catch (err) {
+          setError(err);
+          console.error(err.message);
+        } finally {
+          setIsLoading(false);
         }
-        const data = await res.json();
-        setMovies(data.Search ?? []);
-      } catch (err) {
-        setError(err);
-        console.error(err.message);
-      } finally {
-        setIsLoading(false);
       }
-    }
-    fetchMovies();
-  }, []);
+
+      if (query.length < 3) {
+        setError(new Error("Query too short"));
+        return;
+      }
+
+      fetchMovies();
+    },
+    [query]
+  );
 
   return (
     <>
       <NavBar>
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
@@ -93,19 +104,48 @@ export default function App() {
           {/* {isLoading ? <Loader /> : <List movies={movies} isFav={false} />}
            */}
           {isLoading && <Loader />}
-          {!isLoading && !error && <List movies={movies} isFav={false} />}
+          {!isLoading && !error && (
+            <List
+              movies={movies}
+              isFav={false}
+              onItemClick={(item) => {
+                setSelectedId((id) =>
+                  id === item.imdbID ? null : item.imdbID
+                );
+                console.log(`item clicked ${item}`);
+              }}
+            />
+          )}
           {!isLoading && !error && movies.length === 0 && "No results"}
           {error && <ErrorMessage message={error.message} />}
         </Box>
 
         <Box>
-          <>
-            <Summary movies={watched} />
-            <List movies={watched} isFav={true} />
-          </>
+          {selectedId ? (
+            <MovieDetails
+              movieId={selectedId}
+              onCloseMovie={(x) => setSelectedId(null)}
+            />
+          ) : (
+            <>
+              <Summary movies={watched} />
+              <List movies={watched} isFav={true} />
+            </>
+          )}
         </Box>
       </Main>
     </>
+  );
+}
+
+function MovieDetails({ movieId, onCloseMovie }) {
+  return (
+    <div className="details">
+      <button className="btn-back" onClick={onCloseMovie}>
+        &larr;
+      </button>
+      {movieId}
+    </div>
   );
 }
 
@@ -140,8 +180,7 @@ function Logo() {
   );
 }
 
-function Search() {
-  const [query, setQuery] = useState("");
+function Search({ query, setQuery }) {
   return (
     <input
       className="search"
@@ -165,11 +204,11 @@ function Main({ children }) {
   return <main className="main">{children}</main>;
 }
 
-function List({ movies, isFav }) {
+function List({ movies, isFav, onItemClick }) {
   return (
-    <ul className="list">
+    <ul className="list list-movies">
       {movies?.map((movie) => (
-        <li key={movie.imdbID}>
+        <li key={movie.imdbID} onClick={() => onItemClick(movie)}>
           <img src={movie.Poster} alt={`${movie.Title} poster`} />
           <h3>{movie.Title}</h3>
           {isFav && (
