@@ -7,7 +7,7 @@ import { Loader } from "./Loader.js";
 export function MovieDetails({ movieId, onCloseMovie, onAddWatched, watched }) {
   const [details, setDetails] = useState({});
   const [userRating, setUserRating] = useState(null);
-  const [isLoading, setIsLoading] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const watchedRating = watched.find(
     (watched) => watched.imdbID === movieId
@@ -67,6 +67,11 @@ export function MovieDetails({ movieId, onCloseMovie, onAddWatched, watched }) {
     function () {
       if (!Title) return;
       document.title = `Movie | ${Title}`;
+
+      return function () {
+        document.title = "usePopcorn";
+        console.log(`Cleanup function called for ${Title}`);
+      };
     },
     [Title]
   );
