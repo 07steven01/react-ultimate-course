@@ -56,6 +56,13 @@ export default function App() {
     [query]
   );
 
+  useEffect(
+    function () {
+      if (!selectedId) document.title = "usePopcorn";
+    },
+    [selectedId]
+  );
+
   const handleMovieAddedToWatched = function (movie) {
     setWatched((movies) => [...movies, movie]);
   };

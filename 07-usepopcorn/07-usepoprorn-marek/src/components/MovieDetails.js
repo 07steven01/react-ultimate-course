@@ -62,6 +62,14 @@ export function MovieDetails({ movieId, onCloseMovie, onAddWatched, watched }) {
     },
     [movieId]
   );
+
+  useEffect(
+    function () {
+      if (!Title) return;
+      document.title = `Movie | ${Title}`;
+    },
+    [Title]
+  );
   return (
     <div className="details">
       {isLoading ? (
