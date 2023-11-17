@@ -24,6 +24,20 @@ export default function App() {
   const [isLoading, setIsLoading] = useState();
   const [error, setError] = useState();
 
+  useEffect(function () {
+    function callback(e) {
+      if (e.code === "Escape") {
+        handleCloseMovie();
+        console.log("CLOSING");
+      }
+    }
+
+    document.addEventListener("keydown", callback);
+    return function () {
+      document.removeEventListener("keydown", callback);
+    };
+  }, []);
+
   useEffect(
     function () {
       const controller = new AbortController();
@@ -43,7 +57,8 @@ export default function App() {
           setMovies(data.Search ?? []);
           setError(null);
         } catch (err) {
-          if (err.name !== "AbortErrror") {
+          console.log(err.name);
+          if (err.name !== "AbortError") {
             setError(err);
             console.error(err.message);
           }
@@ -57,6 +72,7 @@ export default function App() {
         return;
       }
 
+      handleCloseMovie();
       fetchMovies();
 
       return function () {
@@ -72,6 +88,10 @@ export default function App() {
 
   const handleDeleteWatched = function (id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  };
+
+  const handleCloseMovie = function () {
+    setSelectedId(null);
   };
 
   return (
@@ -103,7 +123,7 @@ export default function App() {
           {selectedId ? (
             <MovieDetails
               movieId={selectedId}
-              onCloseMovie={(x) => setSelectedId(null)}
+              onCloseMovie={handleCloseMovie}
               onAddWatched={(movie) => handleMovieAddedToWatched(movie)}
               watched={watched}
               onDeleteWatched={(id) => handleDeleteWatched(id)}
