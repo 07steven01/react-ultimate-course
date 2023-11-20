@@ -19,10 +19,38 @@ export const average = (arr) =>
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  // const [watched, setWatched] = useState(parse()); // every render
+  const [watched, setWatched] = useState(function () {
+    // only mount
+    const watchedFromStorage = JSON.parse(localStorage.getItem("watched"));
+    console.log(
+      watchedFromStorage,
+      "length",
+      watchedFromStorage.length,
+      watchedFromStorage[0]
+    );
+    return watchedFromStorage.length > 0 ? watchedFromStorage : [];
+  });
   const [selectedId, setSelectedId] = useState(null);
   const [isLoading, setIsLoading] = useState();
   const [error, setError] = useState();
+
+  // function parse() {
+  // console.log("parse");
+  // return JSON.parse(localStorage.getItem("watched"));
+  // }
+
+  const handleMovieAddedToWatched = function (movie) {
+    setWatched((movies) => [...movies, movie]);
+  };
+
+  const handleDeleteWatched = function (id) {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
+  };
+
+  const handleCloseMovie = function () {
+    setSelectedId(null);
+  };
 
   useEffect(function () {
     function callback(e) {
@@ -82,17 +110,18 @@ export default function App() {
     [query]
   );
 
-  const handleMovieAddedToWatched = function (movie) {
-    setWatched((movies) => [...movies, movie]);
-  };
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
-  const handleDeleteWatched = function (id) {
-    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
-  };
-
-  const handleCloseMovie = function () {
-    setSelectedId(null);
-  };
+  // useEffect(function () {
+  //   const watchedFromStorage = localStorage.getItem("watched");
+  //   if (!watchedFromStorage) return;
+  //   setWatched(watched);
+  // }, []);
 
   return (
     <>
