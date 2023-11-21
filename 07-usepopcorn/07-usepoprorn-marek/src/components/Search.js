@@ -3,10 +3,27 @@ import { useEffect, useRef } from "react";
 export function Search({ query, setQuery }) {
   const inputElement = useRef(null); // reference to...
 
-  useEffect(function () {
-    console.log(inputElement.current);
-    inputElement.current.focus();
-  }, []);
+  useEffect(
+    function () {
+      function callback(e) {
+        if (
+          e.code === "Enter" &&
+          document.activeElement !== inputElement.current
+        ) {
+          //focus
+          console.log("keydown");
+          inputElement.current.focus();
+          setQuery("");
+        }
+      }
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [setQuery]
+  );
 
   return (
     <input
