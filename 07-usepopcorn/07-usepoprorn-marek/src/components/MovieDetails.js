@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
 import StarRating from "./StarRating.js";
 import { apiKey } from "./App.js";
@@ -8,6 +8,20 @@ export function MovieDetails({ movieId, onCloseMovie, onAddWatched, watched }) {
   const [details, setDetails] = useState({});
   const [userRating, setUserRating] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const countRef = useRef(0);
+  // let count = 0;  // wouldn't work, would be reset on every rerender
+
+  useEffect(
+    function () {
+      // do not increment on mount
+      if (userRating) {
+        countRef.current += 1;
+        console.log("countRef", countRef.current);
+      }
+    },
+    [userRating]
+  );
 
   const watchedRating = watched.find(
     (watched) => watched.imdbID === movieId
@@ -37,6 +51,7 @@ export function MovieDetails({ movieId, onCloseMovie, onAddWatched, watched }) {
       imdbRating: Number(imdbRating),
       userRating,
       runtime: Number(runtime.split(" ").at(0)),
+      countRatingDecisions: countRef.current,
     };
     console.log("watched ", watchedMovie);
     onAddWatched(watchedMovie);
