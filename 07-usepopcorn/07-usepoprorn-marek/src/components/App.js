@@ -10,6 +10,7 @@ import { Main } from "./Main.js";
 import { List } from "./List.js";
 import { Summary } from "./Summary.js";
 import { Box } from "./Box.js";
+import { useMovies } from "../hooks/useMovies.js";
 
 export const apiKey = "c71825c5";
 
@@ -18,11 +19,11 @@ export const average = (arr) =>
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const [movies, setMovies] = useState([]);
   // const [watched, setWatched] = useState(parse()); // every render
   const [watched, setWatched] = useState(function () {
     // only mount
     const watchedFromStorage = JSON.parse(localStorage.getItem("watched"));
+    if (!watchedFromStorage) return [];
     console.log(
       watchedFromStorage,
       "length",
@@ -32,13 +33,6 @@ export default function App() {
     return watchedFromStorage.length > 0 ? watchedFromStorage : [];
   });
   const [selectedId, setSelectedId] = useState(null);
-  const [isLoading, setIsLoading] = useState();
-  const [error, setError] = useState();
-
-  // function parse() {
-  // console.log("parse");
-  // return JSON.parse(localStorage.getItem("watched"));
-  // }
 
   const handleMovieAddedToWatched = function (movie) {
     setWatched((movies) => [...movies, movie]);
@@ -51,6 +45,12 @@ export default function App() {
   const handleCloseMovie = function () {
     setSelectedId(null);
   };
+
+  const {
+    movies = [],
+    isLoading,
+    error,
+  } = useMovies(query, handleCloseMovie, apiKey);
 
   useEffect(function () {
     function callback(e) {
@@ -65,50 +65,6 @@ export default function App() {
       document.removeEventListener("keydown", callback);
     };
   }, []);
-
-  useEffect(
-    function () {
-      const controller = new AbortController();
-
-      async function fetchMovies() {
-        try {
-          setError(null);
-          setIsLoading(true);
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${apiKey}&s=${query}`,
-            { signal: controller.signal }
-          );
-          if (!res.ok) {
-            throw new Error("Fetching movies failed");
-          }
-          const data = await res.json();
-          setMovies(data.Search ?? []);
-          setError(null);
-        } catch (err) {
-          console.log(err.name);
-          if (err.name !== "AbortError") {
-            setError(err);
-            console.error(err.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
-      }
-
-      if (query.length < 3) {
-        setError(new Error("Query too short"));
-        return;
-      }
-
-      handleCloseMovie();
-      fetchMovies();
-
-      return function () {
-        controller.abort();
-      };
-    },
-    [query]
-  );
 
   useEffect(
     function () {
@@ -156,6 +112,7 @@ export default function App() {
               onAddWatched={(movie) => handleMovieAddedToWatched(movie)}
               watched={watched}
               onDeleteWatched={(id) => handleDeleteWatched(id)}
+              apiKey={apiKey}
             />
           ) : (
             <>

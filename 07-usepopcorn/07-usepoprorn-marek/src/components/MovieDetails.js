@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { useEffect } from "react";
 import StarRating from "./StarRating.js";
-import { apiKey } from "./App.js";
 import { Loader } from "./Loader.js";
+import { apiKey } from "./App.js";
 
 export function MovieDetails({ movieId, onCloseMovie, onAddWatched, watched }) {
   const [details, setDetails] = useState({});

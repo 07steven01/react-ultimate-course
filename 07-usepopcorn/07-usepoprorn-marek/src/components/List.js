@@ -9,11 +9,11 @@ export function List({ movies, isFav, onItemClick, onDeleteWatched }) {
             <div>
               <p>
                 <span>⭐️</span>
-                <span>{movie.imdbRating.toFixed(1)}</span>
+                <span>{movie.imdbRating?.toFixed(1)}</span>
               </p>
               <p>
                 <span>🌟</span>
-                <span>{movie.userRating.toFixed(1)}</span>
+                <span>{movie.userRating?.toFixed(1)}</span>
               </p>
               <p>
                 <span>⏳</span>
