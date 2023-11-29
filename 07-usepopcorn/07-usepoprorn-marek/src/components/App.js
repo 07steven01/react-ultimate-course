@@ -11,6 +11,7 @@ import { List } from "./List.js";
 import { Summary } from "./Summary.js";
 import { Box } from "./Box.js";
 import { useMovies } from "../hooks/useMovies.js";
+import { useKey } from "../hooks/useKey.js";
 import { useLocalStorageState } from "../hooks/useLocalStorageState.js";
 
 export const apiKey = "c71825c5";
@@ -22,6 +23,8 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [watched, setWatched] = useLocalStorageState([], "watched");
   const [selectedId, setSelectedId] = useState(null);
+
+  useKey("Escape", () => handleCloseMovie());
 
   const handleMovieAddedToWatched = function (movie) {
     setWatched((movies) => [...movies, movie]);
@@ -40,20 +43,6 @@ export default function App() {
     isLoading,
     error,
   } = useMovies(query, handleCloseMovie, apiKey);
-
-  useEffect(function () {
-    function callback(e) {
-      if (e.code === "Escape") {
-        handleCloseMovie();
-        console.log("CLOSING");
-      }
-    }
-
-    document.addEventListener("keydown", callback);
-    return function () {
-      document.removeEventListener("keydown", callback);
-    };
-  }, []);
 
   return (
     <>
