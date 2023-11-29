@@ -11,6 +11,7 @@ import { List } from "./List.js";
 import { Summary } from "./Summary.js";
 import { Box } from "./Box.js";
 import { useMovies } from "../hooks/useMovies.js";
+import { useLocalStorageState } from "../hooks/useLocalStorageState.js";
 
 export const apiKey = "c71825c5";
 
@@ -19,19 +20,7 @@ export const average = (arr) =>
 
 export default function App() {
   const [query, setQuery] = useState("");
-  // const [watched, setWatched] = useState(parse()); // every render
-  const [watched, setWatched] = useState(function () {
-    // only mount
-    const watchedFromStorage = JSON.parse(localStorage.getItem("watched"));
-    if (!watchedFromStorage) return [];
-    console.log(
-      watchedFromStorage,
-      "length",
-      watchedFromStorage.length,
-      watchedFromStorage[0]
-    );
-    return watchedFromStorage.length > 0 ? watchedFromStorage : [];
-  });
+  const [watched, setWatched] = useLocalStorageState([], "watched");
   const [selectedId, setSelectedId] = useState(null);
 
   const handleMovieAddedToWatched = function (movie) {
@@ -65,19 +54,6 @@ export default function App() {
       document.removeEventListener("keydown", callback);
     };
   }, []);
-
-  useEffect(
-    function () {
-      localStorage.setItem("watched", JSON.stringify(watched));
-    },
-    [watched]
-  );
-
-  // useEffect(function () {
-  //   const watchedFromStorage = localStorage.getItem("watched");
-  //   if (!watchedFromStorage) return;
-  //   setWatched(watched);
-  // }, []);
 
   return (
     <>
